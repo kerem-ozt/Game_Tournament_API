@@ -26,6 +26,7 @@ func New() *gin.Engine {
 		AuthRoute(v1)
 		UserRoute(v1)
 		TournamentRoute(v1)
+		leaderboardRouter(v1)
 	}
 
 	docs.SwaggerInfo.BasePath = v1.BasePath() // adds /v1 to swagger base path
