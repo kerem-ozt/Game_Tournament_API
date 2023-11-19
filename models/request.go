@@ -18,6 +18,7 @@ type RegisterRequest struct {
 	Name     string `json:"name"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
+	Country  string `json:"country"`
 }
 
 func (a RegisterRequest) Validate() error {
@@ -25,6 +26,7 @@ func (a RegisterRequest) Validate() error {
 		validation.Field(&a.Name, validation.Required, validation.Length(3, 64)),
 		validation.Field(&a.Email, validation.Required, is.Email),
 		validation.Field(&a.Password, passwordRule...),
+		validation.Field(&a.Country, validation.Required),
 	)
 }
 
@@ -72,11 +74,13 @@ func (a TournamentRequest) Validate() error {
 type ProgressRequest struct {
 	UserID primitive.ObjectID `json:"UserID"`
 	Score  int                `json:"Score"`
+	Coin   int                `json:"Coin"`
 }
 
 func (a ProgressRequest) Validate() error {
 	return validation.ValidateStruct(&a,
 		validation.Field(&a.UserID, validation.Required),
 		validation.Field(&a.Score, validation.Required),
+		validation.Field(&a.Coin, validation.Required),
 	)
 }

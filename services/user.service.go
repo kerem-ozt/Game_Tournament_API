@@ -11,19 +11,44 @@ import (
 )
 
 // CreateUser create a user record
-func CreateUser(name string, email string, plainPassword string) (*db.User, error) {
+func CreateUser(name string, email string, plainPassword string, country string) (*db.User, error) {
 	password, err := bcrypt.GenerateFromPassword([]byte(plainPassword), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, errors.New("cannot generate hashed password")
 	}
 
-	user := db.NewUser(email, string(password), name, db.RoleUser, db.InitialLevel, db.InitialCoin, db.InitialProgress)
+	user := db.NewUser(email, string(password), name, db.RoleUser, country, db.InitialLevel, db.InitialCoin, db.InitialProgress)
 	err = mgm.Coll(user).Create(user)
 	if err != nil {
 		return nil, errors.New("cannot create new user")
 	}
 
 	return user, nil
+}
+
+func GetAllUsers() ([]*db.User, error) {
+	users := []*db.User{}
+	err := mgm.Coll(&db.User{}).SimpleFind(&users, bson.M{})
+	if err != nil {
+		return nil, errors.New("cannot find users")
+	}
+
+	return users, nil
+}
+
+func DeleteUser(userId primitive.ObjectID) error {
+	user := &db.User{}
+	err := mgm.Coll(user).FindByID(userId, user)
+	if err != nil {
+		return errors.New("cannot find user")
+	}
+
+	err = mgm.Coll(user).Delete(user)
+	if err != nil {
+		return errors.New("cannot delete user")
+	}
+
+	return nil
 }
 
 // FindUserById find user by id
@@ -60,8 +85,7 @@ func CheckUserMail(email string) error {
 	return nil
 }
 
-// Progress update users score
-func Progress(userId primitive.ObjectID, score int) error {
+func UpdateUserStat(userId primitive.ObjectID, score int, coin int) error {
 	user := &db.User{}
 	err := mgm.Coll(user).FindByID(userId, user)
 	if err != nil {
@@ -69,6 +93,8 @@ func Progress(userId primitive.ObjectID, score int) error {
 	}
 
 	user.Progress += score
+	user.Coin += coin
+
 	err = mgm.Coll(user).Update(user)
 	if err != nil {
 		return errors.New("cannot update user")
@@ -78,7 +104,7 @@ func Progress(userId primitive.ObjectID, score int) error {
 }
 
 // Attend to tournament
-func Attend(userId primitive.ObjectID, tournamentId primitive.ObjectID) error {
+func AttendToTournament(userId primitive.ObjectID, tournamentId primitive.ObjectID) error {
 	user := &db.User{}
 	err := mgm.Coll(user).FindByID(userId, user)
 	if err != nil {

@@ -9,21 +9,39 @@ func UserRoute(router *gin.RouterGroup, handlers ...gin.HandlerFunc) {
 	user := router.Group("/user", handlers...)
 	{
 		user.GET(
-			"",
+			"/whoami",
 			// validators.CreateUserValidator(),
 			controllers.WhoAmI,
 		)
 
-		user.POST(
-			"/attend",
-			// validators.GetUsersValidator(),
-			controllers.Attend,
+		user.GET(
+			"/getall",
+			// validators.CreateUserValidator(),
+			controllers.GetAllUsers,
+		)
+
+		user.GET(
+			"/getbyid",
+			// validators.CreateUserValidator(),
+			controllers.GetById,
+		)
+
+		user.DELETE(
+			"/delete",
+			// validators.CreateUserValidator(),
+			controllers.DeleteUser,
 		)
 
 		user.POST(
-			"",
+			"/attendtotournament",
+			// validators.GetUsersValidator(),
+			controllers.AttendToTournament,
+		)
+
+		user.POST(
+			"/updatestat",
 			// validators.GetUserValidator(),
-			controllers.Progress,
+			controllers.UpdateUserStat,
 		)
 	}
 }

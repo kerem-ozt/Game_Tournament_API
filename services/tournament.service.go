@@ -8,7 +8,9 @@ import (
 
 	"github.com/kamva/mgm/v3"
 	db "github.com/kerem-ozt/GoodBlast_API/models/db"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // CreateTournament create new tournament record
@@ -23,27 +25,38 @@ func CreateTournament(participants []primitive.ObjectID) (*db.Tournament, error)
 }
 
 // GetTournaments get paginated tournaments list
+// func GetTournaments(userId primitive.ObjectID, page int, limit int) ([]db.Tournament, error) {
 func GetTournaments(page int, limit int) ([]db.Tournament, error) {
 	var tournaments []db.Tournament
 
-	err := mgm.Coll(&db.Tournament{}).SimpleFind(&tournaments, nil, nil)
+	findOptions := options.Find().
+		SetSkip(int64(page * limit)).
+		SetLimit(int64(limit + 1))
 
-	fmt.Println("tournaments: ", tournaments)
+	err := mgm.Coll(&db.Tournament{}).SimpleFind(
+		&tournaments,
+		bson.M{},
+		findOptions,
+	)
 
 	if err != nil {
-		fmt.Println("Error finding tournaments:", err)
 		return nil, errors.New("cannot find tournaments")
-	}
-
-	fmt.Println("Number of Tournaments:", len(tournaments))
-	for _, t := range tournaments {
-		fmt.Println("Tournament:", t)
 	}
 
 	return tournaments, nil
 }
 
-func ProgressTournament(tournamentID primitive.ObjectID) error {
+func GetTournamentById(tournamentId primitive.ObjectID) (*db.Tournament, error) {
+	tournament := &db.Tournament{}
+	err := mgm.Coll(tournament).FindByID(tournamentId, tournament)
+	if err != nil {
+		return nil, errors.New("cannot find tournament")
+	}
+
+	return tournament, nil
+}
+
+func ProgressTournament(tournamentID primitive.ObjectID) ([]primitive.ObjectID, error) {
 	tournament := &db.Tournament{}
 
 	type Participant struct {
@@ -53,19 +66,17 @@ func ProgressTournament(tournamentID primitive.ObjectID) error {
 
 	err := mgm.Coll(tournament).FindByID(tournamentID, tournament)
 	if err != nil {
-		return errors.New("cannot find tournament")
+		return nil, errors.New("cannot find tournament")
 	}
 
 	var participants []Participant
 	for _, objID := range tournament.Participants {
 		id, err := primitive.ObjectIDFromHex(objID.Hex())
 		if err != nil {
-			return errors.New("invalid participant ID")
+			return nil, errors.New("invalid participant ID")
 		}
 		participants = append(participants, Participant{ID: id, Rank: 0})
 	}
-
-	fmt.Println(participants)
 
 	for round := 1; len(tournament.Participants) > 1; round++ {
 		for i := len(tournament.Participants) - 1; i > 0; i-- {
@@ -76,8 +87,6 @@ func ProgressTournament(tournamentID primitive.ObjectID) error {
 		winnerCount := len(tournament.Participants) / 2
 
 		winnersSlice := tournament.Participants[:winnerCount]
-
-		fmt.Println("Round", round, "Winners Slice:", winnersSlice)
 
 		tournament.Participants = tournament.Participants[:winnerCount]
 
@@ -95,14 +104,10 @@ func ProgressTournament(tournamentID primitive.ObjectID) error {
 		fmt.Println("Round", round, "Winners:", winners)
 	}
 
-	fmt.Println("Final Winner:", tournament.Participants[0])
-
-	fmt.Println("Final Participants:", participants)
-
 	for _, participant := range participants {
-		err = Progress(participant.ID, participant.Rank*100)
+		err := UpdateUserStat(participant.ID, participant.Rank*100, 0)
 		if err != nil {
-			return errors.New("cannot update user progress")
+			return nil, errors.New("cannot update user progress")
 		}
 	}
 
@@ -110,11 +115,14 @@ func ProgressTournament(tournamentID primitive.ObjectID) error {
 		return participants[i].Rank > participants[j].Rank
 	})
 
-	fmt.Println("After Sorting:", participants)
-
 	top3winnerIDs := []primitive.ObjectID{participants[0].ID, participants[1].ID, participants[2].ID}
 
-	fmt.Println("After Sorting:", top3winnerIDs)
+	for i, reward := range []int{5000, 3000, 2000} {
+		err := UpdateUserStat(top3winnerIDs[i], 0, reward)
+		if err != nil {
+			return nil, errors.New("cannot update user progress")
+		}
+	}
 
-	return nil
+	return top3winnerIDs, nil
 }

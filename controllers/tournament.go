@@ -79,7 +79,8 @@ func GetTournaments(c *gin.Context) {
 
 	pageQuery := c.DefaultQuery("page", "0")
 	page, _ := strconv.Atoi(pageQuery)
-	limit := 5
+	limitQuery := c.DefaultQuery("limit", "5")
+	limit, _ := strconv.Atoi(limitQuery)
 
 	tournaments, _ := services.GetTournaments(page, limit)
 
@@ -96,10 +97,7 @@ func GetTournaments(c *gin.Context) {
 	response.SendResponse(c)
 }
 
-func ProgressTournament(c *gin.Context) {
-	// var requestBody models.ProgressRequest
-	// _ = c.ShouldBindBodyWith(&requestBody, binding.JSON)
-
+func GetTournamentById(c *gin.Context) {
 	response := &models.Response{
 		StatusCode: http.StatusBadRequest,
 		Success:    false,
@@ -113,23 +111,48 @@ func ProgressTournament(c *gin.Context) {
 		return
 	}
 
-	err = services.ProgressTournament(tournamentID)
+	tournament, err := services.GetTournamentById(tournamentID)
 	if err != nil {
 		response.Message = err.Error()
 		response.SendResponse(c)
 		return
 	}
 
-	// userID := requestBody.UserID
+	response.StatusCode = http.StatusOK
+	response.Success = true
+	response.Data = gin.H{"tournament": tournament}
+	response.SendResponse(c)
+}
 
-	// err := services.Progress(userID, requestBody.Score)
-	// if err != nil {
-	// 	response.Message = err.Error()
-	// 	response.SendResponse(c)
-	// 	return
-	// }
+func ProgressTournament(c *gin.Context) {
+	response := &models.Response{
+		StatusCode: http.StatusBadRequest,
+		Success:    false,
+	}
+
+	tournamentIDStr := c.Query("tournamentID")
+	tournamentID, err := primitive.ObjectIDFromHex(tournamentIDStr)
+	if err != nil {
+		response.Message = err.Error()
+		response.SendResponse(c)
+		return
+	}
+
+	winners, err := services.ProgressTournament(tournamentID)
+	if err != nil {
+		response.Message = err.Error()
+		response.SendResponse(c)
+		return
+	}
+
+	// Convert winners slice to a slice of strings
+	winnersStr := make([]string, len(winners))
+	for i, winner := range winners {
+		winnersStr[i] = winner.Hex()
+	}
 
 	response.StatusCode = http.StatusCreated
 	response.Success = true
+	response.Data = gin.H{"winners": winnersStr}
 	response.SendResponse(c)
 }

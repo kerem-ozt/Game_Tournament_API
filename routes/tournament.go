@@ -6,22 +6,28 @@ import (
 )
 
 func TournamentRoute(router *gin.RouterGroup, handlers ...gin.HandlerFunc) {
-	tournaments := router.Group("/tournaments", handlers...)
+	tournaments := router.Group("/tournament", handlers...)
 	{
 		tournaments.POST(
-			"",
+			"/create",
 			// validators.CreateTournamentValidator(),
 			controllers.CreateNewTournament,
 		)
 
 		tournaments.GET(
-			"",
+			"/getall",
 			// validators.GetTournamentsValidator(),
 			controllers.GetTournaments,
 		)
 
+		tournaments.GET(
+			"/getbyid",
+			// validators.GetTournamentsValidator(),
+			controllers.GetTournamentById,
+		)
+
 		tournaments.POST(
-			"progressTournament",
+			"progress",
 			// validators.CreateTournamentValidator(),
 			controllers.ProgressTournament,
 		)

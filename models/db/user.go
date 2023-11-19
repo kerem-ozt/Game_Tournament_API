@@ -23,6 +23,7 @@ type User struct {
 	Level            int    `json:"level" bson:"level"`
 	Coin             int    `json:"coin" bson:"coin"`
 	Progress         int    `json:"progress" bson:"progress"`
+	Country          string `json:"country" bson:"country"`
 }
 
 type UserClaims struct {
@@ -31,7 +32,7 @@ type UserClaims struct {
 	Type  string `json:"type"`
 }
 
-func NewUser(email string, password string, name string, role string, InitialLevel int, InitialCoin int, InitialProgress int) *User {
+func NewUser(email string, password string, name string, role string, country string, InitialLevel int, InitialCoin int, InitialProgress int) *User {
 	return &User{
 		Email:        email,
 		Password:     password,
@@ -41,6 +42,7 @@ func NewUser(email string, password string, name string, role string, InitialLev
 		Coin:         InitialCoin,
 		Progress:     InitialProgress,
 		MailVerified: false,
+		Country:      country,
 	}
 }
 

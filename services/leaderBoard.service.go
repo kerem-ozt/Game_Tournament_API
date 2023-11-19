@@ -48,13 +48,34 @@ func AddUserToLeaderboard(userID primitive.ObjectID, progress int, leaderboardTy
 }
 
 // GetLeaderboard returns the leaderboard for a given type
-func GetLeaderboard(leaderboardType string) (*db.Leaderboard, error) {
+func GetGlobalLeaderboard(leaderboardType string) (*db.Leaderboard, error) {
 	leaderboard, err := getOrCreateLeaderboard(leaderboardType)
 	if err != nil {
 		return nil, err
 	}
 
 	return leaderboard, nil
+}
+
+// GetLeaderboard returns the leaderboard for a given type
+func GetLeaderboardByCountry(leaderboardType string, country string) (*db.Leaderboard, error) {
+	leaderboard, err := getOrCreateLeaderboard(leaderboardType)
+	if err != nil {
+		return nil, err
+	}
+
+	// Filter the leaderboard by country
+	filteredLeaderboard := &db.Leaderboard{
+		Type:  leaderboardType,
+		Users: []db.LeaderboardUser{},
+	}
+	for _, user := range leaderboard.Users {
+		if user.Country == country {
+			filteredLeaderboard.Users = append(filteredLeaderboard.Users, user)
+		}
+	}
+
+	return filteredLeaderboard, nil
 }
 
 // isUserInLeaderboard checks if a user is already in the leaderboard
@@ -76,10 +97,7 @@ func isUserInLeaderboard(userID primitive.ObjectID, leaderboardType string) (boo
 
 // getOrCreateLeaderboard retrieves an existing leaderboard or creates a new one
 func getOrCreateLeaderboard(leaderboardType string) (*db.Leaderboard, error) {
-	fmt.Println("leaderboardType:", leaderboardType)
 	Leaderboard := &db.Leaderboard{}
-
-	fmt.Println("leaderboard:", Leaderboard)
 
 	query := bson.M{"type": leaderboardType}
 	err := mgm.Coll(&db.Leaderboard{}).First(query, Leaderboard)
@@ -87,7 +105,6 @@ func getOrCreateLeaderboard(leaderboardType string) (*db.Leaderboard, error) {
 		// Leaderboard already exists
 		return Leaderboard, nil
 	}
-	fmt.Println("leaderboard:", Leaderboard)
 
 	// If not found, create a new leaderboard
 	Leaderboard = &db.Leaderboard{
@@ -106,22 +123,16 @@ func getOrCreateLeaderboard(leaderboardType string) (*db.Leaderboard, error) {
 // EnsureLeaderboardInitialized initializes the leaderboard with all users
 func EnsureLeaderboardInitialized(leaderboardType string) error {
 
-	fmt.Println("1 leaderboard:", leaderboardType)
-
 	leaderboard, err := getOrCreateLeaderboard(leaderboardType)
 	if err != nil {
 		return err
 	}
-
-	fmt.Println("1 leaderboard:", leaderboard)
 
 	// Get all users from the database
 	users, err := getAllUsers()
 	if err != nil {
 		return err
 	}
-
-	fmt.Println("2 users:", users)
 
 	// Populate the leaderboard with all users
 	for _, user := range users {
@@ -139,6 +150,7 @@ func EnsureLeaderboardInitialized(leaderboardType string) error {
 			leaderboardUser := db.LeaderboardUser{
 				UserID:   user.ID,
 				Progress: user.Progress, // You may customize this based on your requirements
+				Country:  user.Country,
 			}
 			leaderboard.Users = append(leaderboard.Users, leaderboardUser)
 		}
