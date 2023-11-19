@@ -47,7 +47,7 @@ func CreateNewTournament(c *gin.Context) {
 		participantObjectIDs = append(participantObjectIDs, objectID)
 	}
 
-	tournament, err := services.CreateTournament(participantObjectIDs)
+	tournament, err := services.CreateTournament(participantObjectIDs...)
 	if err != nil {
 		response.Message = err.Error()
 		response.SendResponse(c)

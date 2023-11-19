@@ -14,7 +14,8 @@ import (
 )
 
 // CreateTournament create new tournament record
-func CreateTournament(participants []primitive.ObjectID) (*db.Tournament, error) {
+// func CreateTournament(participants []primitive.ObjectID) (*db.Tournament, error) {
+func CreateTournament(participants ...primitive.ObjectID) (*db.Tournament, error) {
 	tournament := db.NewTournament(participants)
 	err := mgm.Coll(tournament).Create(tournament)
 	if err != nil {
