@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 	"sort"
+	"time"
 
 	"github.com/kamva/mgm/v3"
 	db "github.com/kerem-ozt/GoodBlast_API/models/db"
@@ -57,6 +58,124 @@ func GetTournamentById(tournamentId primitive.ObjectID) (*db.Tournament, error) 
 	return tournament, nil
 }
 
+func FindTournamentByStartDateToday() (*db.Tournament, error) {
+	// Get the current date in UTC
+	now := time.Now().UTC()
+	startOfDay := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
+
+	// Find the tournament with the matching start_date
+	tournament := &db.Tournament{}
+	err := mgm.Coll(tournament).First(bson.M{"startTime": startOfDay}, tournament)
+
+	if err != nil {
+		return nil, errors.New("cannot find tournament")
+	}
+
+	return tournament, nil
+}
+
+func CreateTournamentGroups() ([]db.TournamentGroup, error) {
+	groups := make([]db.TournamentGroup, 0)
+
+	group := db.TournamentGroup{
+		GroupID:      primitive.NewObjectID(),
+		Participants: []primitive.ObjectID{}, // Empty participants for now
+	}
+
+	groups = append(groups, group)
+
+	todayTournament, err := FindTournamentByStartDateToday()
+
+	if err != nil {
+		return nil, err
+	}
+
+	if todayTournament == nil {
+		return nil, errors.New("no tournament found for today")
+	}
+
+	// Add the new groups to the existing groups
+	todayTournament.Groups = append(todayTournament.Groups, groups...)
+
+	// Save the updated tournament to the database
+	err = mgm.Coll(todayTournament).Update(todayTournament)
+	if err != nil {
+		return nil, errors.New("cannot update tournament with groups: " + err.Error())
+	}
+
+	// Check if groups is not empty before returning
+	if len(groups) > 0 {
+		return groups, nil
+	}
+
+	return nil, errors.New("no groups created")
+}
+
+func CreateTournamentGroups0(participants []primitive.ObjectID) ([]db.TournamentGroup, error) {
+	groups := make([]db.TournamentGroup, 0)
+	group := db.TournamentGroup{
+		GroupID:      primitive.NewObjectID(),
+		Participants: participants,
+	}
+	groups = append(groups, group)
+
+	fmt.Println("Groups to be added:", groups)
+
+	// Split participants into groups of MaxParticipants
+	// for i := 0; i < len(participants); i += db.MaxParticipants {
+	// 	end := i + db.MaxParticipants
+	// 	if end > len(participants) {
+	// 		end = len(participants)
+	// 	}
+
+	// 	group := db.TournamentGroup{
+	// 		GroupID:      primitive.NewObjectID(),
+	// 		Participants: participants[i:end],
+	// 	}
+
+	// 	groups = append(groups, group)
+	// }
+
+	todayTournament, err := FindTournamentByStartDateToday()
+
+	fmt.Println("todayTournament", todayTournament)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if todayTournament == nil {
+		return nil, errors.New("no tournament found for today")
+	}
+
+	fmt.Println("Groups to be added:", groups)
+
+	todayTournament.Groups = groups
+	err = mgm.Coll(todayTournament).Update(todayTournament)
+	if err != nil {
+		return nil, errors.New("cannot update tournament with groups")
+	}
+
+	return groups, nil
+
+	// tournament := &db.Tournament{}
+	// err := mgm.Coll(tournament).FindByID(tournamentID, tournament)
+	// if err != nil {
+	// 	return errors.New("cannot find tournament")
+	// }
+
+	// // Update the tournament with the new groups
+	// tournament.Groups = groups
+	// err = mgm.Coll(tournament).Update(tournament)
+	// if err != nil {
+	// 	return errors.New("cannot update tournament with groups")
+	// }
+
+	// return nil
+
+	// return groups, nil
+}
+
 func ProgressTournament(tournamentID primitive.ObjectID) ([]primitive.ObjectID, error) {
 	tournament := &db.Tournament{}
 
@@ -106,7 +225,7 @@ func ProgressTournament(tournamentID primitive.ObjectID) ([]primitive.ObjectID, 
 	}
 
 	for _, participant := range participants {
-		err := UpdateUserStat(participant.ID, participant.Rank*100, 0)
+		err := UpdateProgress(participant.ID, participant.Rank*100, 0)
 		if err != nil {
 			return nil, errors.New("cannot update user progress")
 		}
@@ -118,8 +237,8 @@ func ProgressTournament(tournamentID primitive.ObjectID) ([]primitive.ObjectID, 
 
 	top3winnerIDs := []primitive.ObjectID{participants[0].ID, participants[1].ID, participants[2].ID}
 
-	for i, reward := range []int{5000, 3000, 2000} {
-		err := UpdateUserStat(top3winnerIDs[i], 0, reward)
+	for i, reward := range []int{5000, 3000, 2000, 1000, 1000, 1000, 1000, 1000, 1000, 1000} {
+		err := UpdateProgress(participants[i].ID, 0, reward)
 		if err != nil {
 			return nil, errors.New("cannot update user progress")
 		}

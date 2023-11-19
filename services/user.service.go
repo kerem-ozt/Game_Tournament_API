@@ -85,7 +85,7 @@ func CheckUserMail(email string) error {
 	return nil
 }
 
-func UpdateUserStat(userId primitive.ObjectID, score int, coin int) error {
+func UpdateProgress(userId primitive.ObjectID, score int, coin int) error {
 	user := &db.User{}
 	err := mgm.Coll(user).FindByID(userId, user)
 	if err != nil {
@@ -103,21 +103,61 @@ func UpdateUserStat(userId primitive.ObjectID, score int, coin int) error {
 	return nil
 }
 
-// Attend to tournament
-func AttendToTournament(userId primitive.ObjectID, tournamentId primitive.ObjectID) error {
+func EnterTournament(userID primitive.ObjectID, tournamentID primitive.ObjectID) error {
 	user := &db.User{}
-	err := mgm.Coll(user).FindByID(userId, user)
+	err := mgm.Coll(user).FindByID(userID, user)
 	if err != nil {
 		return errors.New("cannot find user")
 	}
 
 	tournament := &db.Tournament{}
-	err = mgm.Coll(tournament).FindByID(tournamentId, tournament)
+	err = mgm.Coll(tournament).FindByID(tournamentID, tournament)
 	if err != nil {
 		return errors.New("cannot find tournament")
 	}
 
-	tournament.Participants = append(tournament.Participants, userId)
+	if user.Coin < db.EntryFee {
+		return errors.New("user does not have enough coin")
+	}
+
+	user.Coin -= db.EntryFee
+	err = mgm.Coll(user).Update(user)
+	if err != nil {
+		return errors.New("cannot update user")
+	}
+
+	if user.Level < db.MinLevels {
+		return errors.New("user level is not enough")
+	}
+
+	// Create a new group if the tournament has no groups
+	if len(tournament.Groups) == 0 {
+		newGroup := db.TournamentGroup{
+			GroupID:      primitive.NewObjectID(),
+			Participants: []primitive.ObjectID{userID},
+		}
+		tournament.Groups = append(tournament.Groups, newGroup)
+	} else {
+		// Find the first group in the tournament
+		targetGroup := &tournament.Groups[0]
+
+		// Check if the group is full
+		if len(targetGroup.Participants) >= db.MaxParticipants {
+			return errors.New("tournament group is full")
+		}
+
+		// Check if the user is already in the group
+		for _, participantID := range targetGroup.Participants {
+			if participantID == userID {
+				return errors.New("user already in the tournament group")
+			}
+		}
+
+		// Add the user to the group
+		targetGroup.Participants = append(targetGroup.Participants, userID)
+	}
+
+	// Update the tournament with the modified group
 	err = mgm.Coll(tournament).Update(tournament)
 	if err != nil {
 		return errors.New("cannot update tournament")

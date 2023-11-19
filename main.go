@@ -67,6 +67,14 @@ func main() {
 
 	// Schedule routine to create a new tournament every 24 hours
 	go func() {
+		now := time.Now().UTC()
+
+		nextMidnight := time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 0, 0, time.UTC)
+		durationUntilMidnight := nextMidnight.Sub(now)
+		time.Sleep(durationUntilMidnight)
+
+		services.CreateTournament()
+
 		ticker := time.NewTicker(24 * time.Hour)
 		defer ticker.Stop()
 

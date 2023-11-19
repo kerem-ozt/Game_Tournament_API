@@ -156,3 +156,24 @@ func ProgressTournament(c *gin.Context) {
 	response.Data = gin.H{"winners": winnersStr}
 	response.SendResponse(c)
 }
+
+func CreateTournamentGroups(c *gin.Context) {
+	response := &models.Response{
+		StatusCode: http.StatusBadRequest,
+		Success:    false,
+	}
+
+	// Pass the required argument to the CreateTournamentGroups function
+	// groups, err := services.CreateTournamentGroups([]primitive.ObjectID{})
+	groups, err := services.CreateTournamentGroups()
+	if err != nil {
+		response.Message = err.Error()
+		response.SendResponse(c)
+		return
+	}
+
+	response.StatusCode = http.StatusCreated
+	response.Success = true
+	response.Data = gin.H{"groups": groups}
+	response.SendResponse(c)
+}

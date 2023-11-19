@@ -22,7 +22,7 @@ import (
 // @Failure      400  {object}  models.Response
 // @Router       /user [post]
 // @Security     ApiKeyAuth
-func UpdateUserStat(c *gin.Context) {
+func UpdateProgress(c *gin.Context) {
 	var requestBody models.ProgressRequest
 	_ = c.ShouldBindBodyWith(&requestBody, binding.JSON)
 
@@ -33,7 +33,7 @@ func UpdateUserStat(c *gin.Context) {
 
 	userID := requestBody.UserID
 
-	err := services.UpdateUserStat(userID, requestBody.Score, requestBody.Coin)
+	err := services.UpdateProgress(userID, requestBody.Score, requestBody.Coin)
 	if err != nil {
 		response.Message = err.Error()
 		response.SendResponse(c)
@@ -71,7 +71,7 @@ func WhoAmI(c *gin.Context) {
 	response.SendResponse(c)
 }
 
-func AttendToTournament(c *gin.Context) {
+func EnterTournament(c *gin.Context) {
 	response := &models.Response{
 		StatusCode: http.StatusBadRequest,
 		Success:    false,
@@ -100,7 +100,7 @@ func AttendToTournament(c *gin.Context) {
 		return
 	}
 
-	err = services.AttendToTournament(user.ID, tournamentID)
+	err = services.EnterTournament(user.ID, tournamentID)
 	if err != nil {
 		response.Message = err.Error()
 		response.SendResponse(c)

@@ -10,6 +10,12 @@ import (
 var StartTime = time.Now().Truncate(24 * time.Hour)
 var EndTime = StartTime.Add(24 * time.Hour)
 
+const (
+	MaxParticipants = 35
+	MinLevels       = 10
+	EntryFee        = 500
+)
+
 type Tournament struct {
 	mgm.DefaultModel `bson:",inline"`
 	StartTime        time.Time `bson:"startTime"`
@@ -20,11 +26,17 @@ type Tournament struct {
 	// Participants     []primitive.ObjectID `bson:"participants"`
 	Participants []primitive.ObjectID `json:"participants" binding:"required"`
 	Scores       []TournamentScore    `bson:"scores"`
+	Groups       []TournamentGroup    `bson:"groups"`
 }
 
 type TournamentScore struct {
 	UserID primitive.ObjectID `bson:"userId"`
 	Score  int                `bson:"score"`
+}
+
+type TournamentGroup struct {
+	GroupID      primitive.ObjectID   `bson:"groupId"`
+	Participants []primitive.ObjectID `json:"participants" binding:"required"`
 }
 
 func NewTournament(participants []primitive.ObjectID) *Tournament {
@@ -37,6 +49,7 @@ func NewTournament(participants []primitive.ObjectID) *Tournament {
 		// Participants:    []primitive.ObjectID{},
 		Participants: participants,
 		Scores:       []TournamentScore{},
+		Groups:       []TournamentGroup{},
 	}
 }
 

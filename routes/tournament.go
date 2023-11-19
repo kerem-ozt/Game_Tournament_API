@@ -14,6 +14,12 @@ func TournamentRoute(router *gin.RouterGroup, handlers ...gin.HandlerFunc) {
 			controllers.CreateNewTournament,
 		)
 
+		tournaments.POST(
+			"/creategroup",
+			// validators.CreateTournamentValidator(),
+			controllers.CreateTournamentGroups,
+		)
+
 		tournaments.GET(
 			"/getall",
 			// validators.GetTournamentsValidator(),
@@ -27,7 +33,7 @@ func TournamentRoute(router *gin.RouterGroup, handlers ...gin.HandlerFunc) {
 		)
 
 		tournaments.POST(
-			"progress",
+			"/progress",
 			// validators.CreateTournamentValidator(),
 			controllers.ProgressTournament,
 		)

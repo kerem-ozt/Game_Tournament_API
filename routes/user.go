@@ -33,15 +33,15 @@ func UserRoute(router *gin.RouterGroup, handlers ...gin.HandlerFunc) {
 		)
 
 		user.POST(
-			"/attendtotournament",
+			"/entertournament",
 			// validators.GetUsersValidator(),
-			controllers.AttendToTournament,
+			controllers.EnterTournament,
 		)
 
 		user.POST(
-			"/updatestat",
+			"/updateprogress",
 			// validators.GetUserValidator(),
-			controllers.UpdateUserStat,
+			controllers.UpdateProgress,
 		)
 	}
 }
