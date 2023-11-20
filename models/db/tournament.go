@@ -18,15 +18,14 @@ const (
 
 type Tournament struct {
 	mgm.DefaultModel `bson:",inline"`
-	StartTime        time.Time `bson:"startTime"`
-	EndTime          time.Time `bson:"endTime"`
-	MinLevels        int       `bson:"minLevels"`
-	EntryFee         int       `bson:"entryFee"`
-	MaxParticipants  int       `bson:"maxParticipants"`
-	// Participants     []primitive.ObjectID `bson:"participants"`
-	Participants []primitive.ObjectID `json:"participants" binding:"required"`
-	Scores       []TournamentScore    `bson:"scores"`
-	Groups       []TournamentGroup    `bson:"groups"`
+	StartTime        time.Time            `bson:"startTime"`
+	EndTime          time.Time            `bson:"endTime"`
+	MinLevels        int                  `bson:"minLevels"`
+	EntryFee         int                  `bson:"entryFee"`
+	MaxParticipants  int                  `bson:"maxParticipants"`
+	Participants     []primitive.ObjectID `json:"participants" binding:"required"`
+	Scores           []TournamentScore    `bson:"scores"`
+	Groups           []TournamentGroup    `bson:"groups"`
 }
 
 type TournamentScore struct {

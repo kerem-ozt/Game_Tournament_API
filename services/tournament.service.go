@@ -189,60 +189,91 @@ func ProgressTournament(tournamentID primitive.ObjectID) ([]primitive.ObjectID, 
 		return nil, errors.New("cannot find tournament")
 	}
 
-	var participants []Participant
-	for _, objID := range tournament.Participants {
-		id, err := primitive.ObjectIDFromHex(objID.Hex())
-		if err != nil {
-			return nil, errors.New("invalid participant ID")
+	var winners []Participant //
+
+	// Iterate through groups
+	for _, group := range tournament.Groups { //
+		fmt.Println("Group:", group)
+		var participants []Participant
+
+		// Iterate through participants within the group
+		for _, objID := range group.Participants {
+			id, err := primitive.ObjectIDFromHex(objID.Hex())
+			if err != nil {
+				return nil, errors.New("invalid participant ID")
+			}
+			participants = append(participants, Participant{ID: id, Rank: 0})
 		}
-		participants = append(participants, Participant{ID: id, Rank: 0})
-	}
 
-	for round := 1; len(tournament.Participants) > 1; round++ {
-		for i := len(tournament.Participants) - 1; i > 0; i-- {
-			j := rand.Intn(i + 1)
-			tournament.Participants[i], tournament.Participants[j] = tournament.Participants[j], tournament.Participants[i]
-		}
+		// Progress the tournament within the group
+		for round := 1; len(group.Participants) > 1; round++ {
+			for i := len(group.Participants) - 1; i > 0; i-- {
+				j := rand.Intn(i + 1)
+				group.Participants[i], group.Participants[j] = group.Participants[j], group.Participants[i]
+			}
 
-		winnerCount := len(tournament.Participants) / 2
+			winnerCount := len(group.Participants) / 2
 
-		winnersSlice := tournament.Participants[:winnerCount]
+			winnersSlice := group.Participants[:winnerCount]
 
-		tournament.Participants = tournament.Participants[:winnerCount]
+			group.Participants = group.Participants[:winnerCount]
 
-		var winners []Participant
-		for _, winner := range winnersSlice {
-			for j := range participants {
-				if participants[j].ID == winner {
-					participants[j].Rank = round
-					winners = append(winners, participants[j])
-					break
+			// var winners []Participant
+			for _, winner := range winnersSlice {
+				for j := range participants {
+					if participants[j].ID == winner { // Access the ID field of the Participant struct
+						participants[j].Rank = round
+						winners = append(winners, participants[j])
+						break
+					}
 				}
+			}
+
+			// for _, winner := range winnersSlice {
+			//     winners = append(winners, winner)
+			// }
+
+			fmt.Println("Group Round", round, "Winners:", winners)
+		}
+
+		fmt.Println("PPPPPParticipants:", winners)
+		fmt.Println("PPPPPParticipants:", participants)
+
+		// Update progress for each participant in the group
+		for _, participants := range participants {
+			err := UpdateProgress(participants.ID, participants.Rank*100, 0)
+			if err != nil {
+				return nil, errors.New("cannot update user progress")
 			}
 		}
 
-		fmt.Println("Round", round, "Winners:", winners)
-	}
+		// Sort participants by rank
+		sort.Slice(participants, func(i, j int) bool {
+			return participants[i].Rank > participants[j].Rank
+		})
 
-	for _, participant := range participants {
-		err := UpdateProgress(participant.ID, participant.Rank*100, 0)
-		if err != nil {
-			return nil, errors.New("cannot update user progress")
+		// Get the top 3 winner IDs within the group
+		top3winnerIDs := []primitive.ObjectID{}
+		for i := 0; i < 3 && i < len(participants); i++ {
+			top3winnerIDs = append(top3winnerIDs, participants[i].ID)
+		}
+
+		// Update progress for top 3 winners within the group with rewards
+		rewards := []int{5000, 3000, 2000, 1000, 1000, 1000, 1000, 1000, 1000, 1000}
+
+		for i, reward := range rewards {
+			if i < len(participants) {
+				err := UpdateProgress(participants[i].ID, 0, reward)
+				if err != nil {
+					return nil, errors.New("cannot update user progress")
+				}
+			}
 		}
 	}
 
-	sort.Slice(participants, func(i, j int) bool {
-		return participants[i].Rank > participants[j].Rank
-	})
-
-	top3winnerIDs := []primitive.ObjectID{participants[0].ID, participants[1].ID, participants[2].ID}
-
-	for i, reward := range []int{5000, 3000, 2000, 1000, 1000, 1000, 1000, 1000, 1000, 1000} {
-		err := UpdateProgress(participants[i].ID, 0, reward)
-		if err != nil {
-			return nil, errors.New("cannot update user progress")
-		}
+	var winnerIDs []primitive.ObjectID
+	for _, winner := range winners {
+		winnerIDs = append(winnerIDs, winner.ID)
 	}
-
-	return top3winnerIDs, nil
+	return winnerIDs, nil
 }
