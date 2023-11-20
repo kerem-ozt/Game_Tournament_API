@@ -92,8 +92,13 @@ func UpdateProgress(userId primitive.ObjectID, score int, coin int) error {
 		return errors.New("cannot find user")
 	}
 
-	user.Progress += score
-	user.Coin += coin
+	newLevel := ((user.Progress + score) / 1000) + 1
+	coinsEarned := (newLevel - user.Level) * 100
+
+	user.Progress = (user.Progress + score) % 1000
+	user.Level = newLevel
+
+	user.Coin = user.Coin + coin + coinsEarned
 
 	err = mgm.Coll(user).Update(user)
 	if err != nil {
@@ -143,7 +148,11 @@ func EnterTournament(userID primitive.ObjectID, tournamentID primitive.ObjectID)
 
 		// Check if the group is full
 		if len(targetGroup.Participants) >= db.MaxParticipants {
-			return errors.New("tournament group is full")
+			newGroup := db.TournamentGroup{
+				GroupID:      primitive.NewObjectID(),
+				Participants: []primitive.ObjectID{userID},
+			}
+			tournament.Groups = append(tournament.Groups, newGroup)
 		}
 
 		// Check if the user is already in the group
