@@ -8,7 +8,7 @@ import (
 )
 
 var StartTime = time.Now().Truncate(24 * time.Hour)
-var EndTime = StartTime.Add(24 * time.Hour)
+var EndTime = StartTime.Add(24*time.Hour - time.Minute)
 
 const (
 	MaxParticipants = 35
@@ -45,10 +45,9 @@ func NewTournament(participants []primitive.ObjectID) *Tournament {
 		MinLevels:       10,
 		EntryFee:        500,
 		MaxParticipants: 35,
-		// Participants:    []primitive.ObjectID{},
-		Participants: participants,
-		Scores:       []TournamentScore{},
-		Groups:       []TournamentGroup{},
+		Participants:    participants,
+		Scores:          []TournamentScore{},
+		Groups:          []TournamentGroup{},
 	}
 }
 

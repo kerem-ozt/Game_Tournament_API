@@ -17,6 +17,13 @@ import (
 // CreateTournament create new tournament record
 // func CreateTournament(participants []primitive.ObjectID) (*db.Tournament, error) {
 func CreateTournament(participants ...primitive.ObjectID) (*db.Tournament, error) {
+
+	todayTournament, _ := FindTournamentByStartDateToday()
+
+	if todayTournament != nil {
+		return nil, errors.New("tournament already exists for today")
+	}
+
 	tournament := db.NewTournament(participants)
 	err := mgm.Coll(tournament).Create(tournament)
 	if err != nil {
@@ -235,9 +242,6 @@ func ProgressTournament(tournamentID primitive.ObjectID) ([]primitive.ObjectID, 
 
 			fmt.Println("Group Round", round, "Winners:", winners)
 		}
-
-		fmt.Println("PPPPPParticipants:", winners)
-		fmt.Println("PPPPPParticipants:", participants)
 
 		// Update progress for each participant in the group
 		for _, participants := range participants {
