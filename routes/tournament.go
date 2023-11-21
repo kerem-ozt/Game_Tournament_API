@@ -3,6 +3,7 @@ package routes
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/kerem-ozt/GoodBlast_API/controllers"
+	"github.com/kerem-ozt/GoodBlast_API/middlewares/validators"
 )
 
 func TournamentRoute(router *gin.RouterGroup, handlers ...gin.HandlerFunc) {
@@ -10,31 +11,27 @@ func TournamentRoute(router *gin.RouterGroup, handlers ...gin.HandlerFunc) {
 	{
 		tournaments.POST(
 			"/create",
-			// validators.CreateTournamentValidator(),
+			validators.CreateNewTournament(),
 			controllers.CreateNewTournament,
 		)
 
 		tournaments.POST(
 			"/creategroup",
-			// validators.CreateTournamentValidator(),
 			controllers.CreateTournamentGroups,
 		)
 
 		tournaments.GET(
 			"/getall",
-			// validators.GetTournamentsValidator(),
 			controllers.GetTournaments,
 		)
 
 		tournaments.GET(
 			"/getbyid",
-			// validators.GetTournamentsValidator(),
 			controllers.GetTournamentById,
 		)
 
 		tournaments.POST(
 			"/progress",
-			// validators.CreateTournamentValidator(),
 			controllers.ProgressTournament,
 		)
 	}

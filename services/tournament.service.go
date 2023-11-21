@@ -15,7 +15,6 @@ import (
 )
 
 // CreateTournament create new tournament record
-// func CreateTournament(participants []primitive.ObjectID) (*db.Tournament, error) {
 func CreateTournament(participants ...primitive.ObjectID) (*db.Tournament, error) {
 
 	todayTournament, _ := FindTournamentByStartDateToday()
@@ -34,7 +33,6 @@ func CreateTournament(participants ...primitive.ObjectID) (*db.Tournament, error
 }
 
 // GetTournaments get paginated tournaments list
-// func GetTournaments(userId primitive.ObjectID, page int, limit int) ([]db.Tournament, error) {
 func GetTournaments(page int, limit int) ([]db.Tournament, error) {
 	var tournaments []db.Tournament
 
@@ -55,6 +53,7 @@ func GetTournaments(page int, limit int) ([]db.Tournament, error) {
 	return tournaments, nil
 }
 
+// GetTournamentById get tournament by id
 func GetTournamentById(tournamentId primitive.ObjectID) (*db.Tournament, error) {
 	tournament := &db.Tournament{}
 	err := mgm.Coll(tournament).FindByID(tournamentId, tournament)
@@ -65,6 +64,7 @@ func GetTournamentById(tournamentId primitive.ObjectID) (*db.Tournament, error) 
 	return tournament, nil
 }
 
+// FindTournamentByStartDateToday find tournament by start_date
 func FindTournamentByStartDateToday() (*db.Tournament, error) {
 	// Get the current date in UTC
 	now := time.Now().UTC()
@@ -81,22 +81,26 @@ func FindTournamentByStartDateToday() (*db.Tournament, error) {
 	return tournament, nil
 }
 
+// CreateTournamentGroups create tournament groups
 func CreateTournamentGroups() ([]db.TournamentGroup, error) {
 	groups := make([]db.TournamentGroup, 0)
 
+	// Create a new group
 	group := db.TournamentGroup{
 		GroupID:      primitive.NewObjectID(),
 		Participants: []primitive.ObjectID{}, // Empty participants for now
 	}
 
+	// Add the new group to the groups slice
 	groups = append(groups, group)
 
+	// Find the tournament for today
 	todayTournament, err := FindTournamentByStartDateToday()
-
 	if err != nil {
 		return nil, err
 	}
 
+	// Check if the tournament exists
 	if todayTournament == nil {
 		return nil, errors.New("no tournament found for today")
 	}
@@ -118,85 +122,23 @@ func CreateTournamentGroups() ([]db.TournamentGroup, error) {
 	return nil, errors.New("no groups created")
 }
 
-func CreateTournamentGroups0(participants []primitive.ObjectID) ([]db.TournamentGroup, error) {
-	groups := make([]db.TournamentGroup, 0)
-	group := db.TournamentGroup{
-		GroupID:      primitive.NewObjectID(),
-		Participants: participants,
-	}
-	groups = append(groups, group)
-
-	fmt.Println("Groups to be added:", groups)
-
-	// Split participants into groups of MaxParticipants
-	// for i := 0; i < len(participants); i += db.MaxParticipants {
-	// 	end := i + db.MaxParticipants
-	// 	if end > len(participants) {
-	// 		end = len(participants)
-	// 	}
-
-	// 	group := db.TournamentGroup{
-	// 		GroupID:      primitive.NewObjectID(),
-	// 		Participants: participants[i:end],
-	// 	}
-
-	// 	groups = append(groups, group)
-	// }
-
-	todayTournament, err := FindTournamentByStartDateToday()
-
-	fmt.Println("todayTournament", todayTournament)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if todayTournament == nil {
-		return nil, errors.New("no tournament found for today")
-	}
-
-	fmt.Println("Groups to be added:", groups)
-
-	todayTournament.Groups = groups
-	err = mgm.Coll(todayTournament).Update(todayTournament)
-	if err != nil {
-		return nil, errors.New("cannot update tournament with groups")
-	}
-
-	return groups, nil
-
-	// tournament := &db.Tournament{}
-	// err := mgm.Coll(tournament).FindByID(tournamentID, tournament)
-	// if err != nil {
-	// 	return errors.New("cannot find tournament")
-	// }
-
-	// // Update the tournament with the new groups
-	// tournament.Groups = groups
-	// err = mgm.Coll(tournament).Update(tournament)
-	// if err != nil {
-	// 	return errors.New("cannot update tournament with groups")
-	// }
-
-	// return nil
-
-	// return groups, nil
-}
-
+// EnterTournament enter user to tournament
 func ProgressTournament(tournamentID primitive.ObjectID) ([]primitive.ObjectID, error) {
 	tournament := &db.Tournament{}
 
+	// Define a struct to store the participant ID and rank
 	type Participant struct {
 		ID   primitive.ObjectID `bson:"id"`
 		Rank int
 	}
 
+	// Find the tournament by ID
 	err := mgm.Coll(tournament).FindByID(tournamentID, tournament)
 	if err != nil {
 		return nil, errors.New("cannot find tournament")
 	}
 
-	var winners []Participant //
+	var winners []Participant
 
 	// Iterate through groups
 	for _, group := range tournament.Groups { //
@@ -236,10 +178,6 @@ func ProgressTournament(tournamentID primitive.ObjectID) ([]primitive.ObjectID, 
 				}
 			}
 
-			// for _, winner := range winnersSlice {
-			//     winners = append(winners, winner)
-			// }
-
 			fmt.Println("Group Round", round, "Winners:", winners)
 		}
 
@@ -275,6 +213,10 @@ func ProgressTournament(tournamentID primitive.ObjectID) ([]primitive.ObjectID, 
 		}
 	}
 
+	// Save the updated tournament to the cache
+	CacheOneTournament(tournament.ID, tournament)
+
+	// Return the winner IDs
 	var winnerIDs []primitive.ObjectID
 	for _, winner := range winners {
 		winnerIDs = append(winnerIDs, winner.ID)

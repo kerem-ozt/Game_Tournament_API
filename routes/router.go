@@ -53,5 +53,4 @@ func initRoute(r *gin.Engine) {
 func InitGin() {
 	gin.DisableConsoleColor()
 	gin.SetMode(services.Config.Mode)
-	// do some other initialization staff
 }

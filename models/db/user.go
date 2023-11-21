@@ -49,7 +49,3 @@ func NewUser(email string, password string, name string, role string, country st
 func (model *User) CollectionName() string {
 	return "users"
 }
-
-// You can override Collection functions or CRUD hooks
-// https://github.com/Kamva/mgm#a-models-hooks
-// https://github.com/Kamva/mgm#collections

@@ -26,6 +26,7 @@ func CreateUser(name string, email string, plainPassword string, country string)
 	return user, nil
 }
 
+// GetAllUsers get all users
 func GetAllUsers() ([]*db.User, error) {
 	users := []*db.User{}
 	err := mgm.Coll(&db.User{}).SimpleFind(&users, bson.M{})
@@ -36,6 +37,7 @@ func GetAllUsers() ([]*db.User, error) {
 	return users, nil
 }
 
+// DeleteUser delete user by id
 func DeleteUser(userId primitive.ObjectID) error {
 	user := &db.User{}
 	err := mgm.Coll(user).FindByID(userId, user)
@@ -85,6 +87,7 @@ func CheckUserMail(email string) error {
 	return nil
 }
 
+// UpdateProgress update user progress
 func UpdateProgress(userId primitive.ObjectID, score int, coin int) error {
 	user := &db.User{}
 	err := mgm.Coll(user).FindByID(userId, user)
@@ -108,6 +111,7 @@ func UpdateProgress(userId primitive.ObjectID, score int, coin int) error {
 	return nil
 }
 
+// EnterTournament enter user to tournament
 func EnterTournament(userID primitive.ObjectID, tournamentID primitive.ObjectID) error {
 	user := &db.User{}
 	err := mgm.Coll(user).FindByID(userID, user)

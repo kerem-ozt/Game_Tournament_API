@@ -20,7 +20,7 @@ import (
 // @Param        req  body      models.TournamentRequest true "Tournament Request"
 // @Success      200  {object}  models.Response
 // @Failure      400  {object}  models.Response
-// @Router       /tournaments [post]
+// @Router       /create [post]
 // @Security     ApiKeyAuth
 func CreateNewTournament(c *gin.Context) {
 	var requestBody models.TournamentRequest
@@ -64,12 +64,11 @@ func CreateNewTournament(c *gin.Context) {
 // @Summary      Get Tournaments
 // @Description  gets tournaments with pagination
 // @Tags         tournaments
-// @Accept       json
 // @Produce      json
 // @Param        page  query    string  false  "Switch page by 'page'"
 // @Success      200  {object}  models.Response
 // @Failure      400  {object}  models.Response
-// @Router       /tournaments [get]
+// @Router       /getall [get]
 // @Security     ApiKeyAuth
 func GetTournaments(c *gin.Context) {
 	response := &models.Response{
@@ -97,6 +96,16 @@ func GetTournaments(c *gin.Context) {
 	response.SendResponse(c)
 }
 
+// GetTournaments godoc
+// @Summary      Get One Tournament
+// @Description  get tournament by id
+// @Tags         tournaments
+// @Produce      json
+// @Param        tournamentID  query	string  true  "Tournament ID"
+// @Success      200  {object}  models.Response
+// @Failure      400  {object}  models.Response
+// @Router       /getbyid [get]
+// @Security     ApiKeyAuth
 func GetTournamentById(c *gin.Context) {
 	response := &models.Response{
 		StatusCode: http.StatusBadRequest,
@@ -124,6 +133,16 @@ func GetTournamentById(c *gin.Context) {
 	response.SendResponse(c)
 }
 
+// ProgressTournament godoc
+// @Summary      Progress Tournament
+// @Description  progresses tournament to next round
+// @Tags         tournaments
+// @Produce      json
+// @Param        tournamentID  query	string  true  "Tournament ID"
+// @Success      200  {object}  models.Response
+// @Failure      400  {object}  models.Response
+// @Router       /progress [get]
+// @Security     ApiKeyAuth
 func ProgressTournament(c *gin.Context) {
 	response := &models.Response{
 		StatusCode: http.StatusBadRequest,
@@ -145,7 +164,6 @@ func ProgressTournament(c *gin.Context) {
 		return
 	}
 
-	// Convert winners slice to a slice of strings
 	winnersStr := make([]string, len(winners))
 	for i, winner := range winners {
 		winnersStr[i] = winner.Hex()
@@ -157,14 +175,21 @@ func ProgressTournament(c *gin.Context) {
 	response.SendResponse(c)
 }
 
+// CreateTournamentGroups godoc
+// @Summary      Create Tournament Groups
+// @Description  creates groups for tournament
+// @Tags         tournaments
+// @Produce      json
+// @Success      200  {object}  models.Response
+// @Failure      400  {object}  models.Response
+// @Router       /creategroup [get]
+// @Security     ApiKeyAuth
 func CreateTournamentGroups(c *gin.Context) {
 	response := &models.Response{
 		StatusCode: http.StatusBadRequest,
 		Success:    false,
 	}
 
-	// Pass the required argument to the CreateTournamentGroups function
-	// groups, err := services.CreateTournamentGroups([]primitive.ObjectID{})
 	groups, err := services.CreateTournamentGroups()
 	if err != nil {
 		response.Message = err.Error()

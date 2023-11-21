@@ -11,16 +11,16 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// Progress godoc
-// @Summary      Progress
-// @Description  progress users score
-// @Tags         user
+// UpdateProgress godoc
+// @Summary      Update Progress
+// @Description  updates the progress of a user
+// @Tags         users
 // @Accept       json
 // @Produce      json
-// @Param        req  body      models.TournamentRequest true "Progress Request"
+// @Param        req  body      models.ProgressRequest true "Progress Request"
 // @Success      200  {object}  models.Response
 // @Failure      400  {object}  models.Response
-// @Router       /user [post]
+// @Router       /update [post]
 // @Security     ApiKeyAuth
 func UpdateProgress(c *gin.Context) {
 	var requestBody models.ProgressRequest
@@ -45,6 +45,16 @@ func UpdateProgress(c *gin.Context) {
 	response.SendResponse(c)
 }
 
+// WhoAmI godoc
+// @Summary      Who Am I
+// @Description  returns the user information
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  models.Response
+// @Failure      400  {object}  models.Response
+// @Router       /whoami [get]
+// @Security     ApiKeyAuth
 func WhoAmI(c *gin.Context) {
 	response := &models.Response{
 		StatusCode: http.StatusBadRequest,
@@ -71,6 +81,17 @@ func WhoAmI(c *gin.Context) {
 	response.SendResponse(c)
 }
 
+// EnterTournament godoc
+// @Summary      Enter Tournament
+// @Description  enters the user to the tournament
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        tournamentID  query     string true  "Tournament ID"
+// @Success      200  {object}  models.Response
+// @Failure      400  {object}  models.Response
+// @Router       /entertournament [get]
+// @Security     ApiKeyAuth
 func EnterTournament(c *gin.Context) {
 	response := &models.Response{
 		StatusCode: http.StatusBadRequest,
@@ -112,6 +133,16 @@ func EnterTournament(c *gin.Context) {
 	response.SendResponse(c)
 }
 
+// GetAllUsers godoc
+// @Summary      Get All Users
+// @Description  returns all users
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  models.Response
+// @Failure      400  {object}  models.Response
+// @Router       /getall [get]
+// @Security     ApiKeyAuth
 func GetAllUsers(c *gin.Context) {
 	response := &models.Response{
 		StatusCode: http.StatusBadRequest,
@@ -131,38 +162,54 @@ func GetAllUsers(c *gin.Context) {
 	response.SendResponse(c)
 }
 
+// GetById godoc
+// @Summary      Get User By Id
+// @Description  returns user by id
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        id  query     string true  "User ID"
+// @Success      200  {object}  models.Response
+// @Failure      400  {object}  models.Response
+// @Router       /getbyid [get]
+// @Security     ApiKeyAuth
 func GetById(c *gin.Context) {
 	response := &models.Response{
 		StatusCode: http.StatusBadRequest,
 		Success:    false,
 	}
-	// get id from request parameters
-	// id := c.Param("id")
 
 	id := c.Query("id")
 	objectID, err := primitive.ObjectIDFromHex(id)
 
-	// convert id to primitive.ObjectID
-	// objectID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		models.SendErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	// find user by id
 	user, err := services.FindUserById(objectID)
 	if err != nil {
 		models.SendErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	// send response
 	response.StatusCode = http.StatusOK
 	response.Success = true
 	response.Data = gin.H{"user": user}
 	response.SendResponse(c)
 }
 
+// DeleteUser godoc
+// @Summary      Delete User
+// @Description  deletes user by id
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        id  query     string true  "User ID"
+// @Success      200  {object}  models.Response
+// @Failure      400  {object}  models.Response
+// @Router       /delete [get]
+// @Security     ApiKeyAuth
 func DeleteUser(c *gin.Context) {
 	response := &models.Response{
 		StatusCode: http.StatusBadRequest,

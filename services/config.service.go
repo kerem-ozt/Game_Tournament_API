@@ -10,7 +10,7 @@ var Config *models.EnvConfig
 func LoadConfig() {
 	v := viper.New()
 	v.AutomaticEnv()
-	v.SetDefault("SERVER_PORT", "8080")
+	v.SetDefault("SERVER_PORT", "3002")
 	v.SetDefault("MODE", "debug")
 	v.SetConfigType("dotenv")
 	v.SetConfigName(".env")

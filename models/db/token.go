@@ -1,10 +1,11 @@
 package models
 
 import (
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/kamva/mgm/v3"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"time"
 )
 
 const (
@@ -38,7 +39,3 @@ func NewToken(userId primitive.ObjectID, tokenString string, tokenType string, e
 func (model *Token) CollectionName() string {
 	return "tokens"
 }
-
-// You can override Collection functions or CRUD hooks
-// https://github.com/Kamva/mgm#a-models-hooks
-// https://github.com/Kamva/mgm#collections

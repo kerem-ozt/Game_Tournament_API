@@ -1,11 +1,11 @@
 package models
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
-// Response Base response
 type Response struct {
 	StatusCode int            `json:"-"`
 	Success    bool           `json:"success"`

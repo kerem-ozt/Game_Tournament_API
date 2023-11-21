@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"log"
 	"sync"
@@ -66,7 +67,33 @@ func getTournamentCacheKey(userId primitive.ObjectID, tournamentId primitive.Obj
 	return "req:cache:tournament:" + userId.Hex() + ":" + tournamentId.Hex()
 }
 
-func CacheOneTournament(userId primitive.ObjectID, tournament *models.Tournament) {
+func CacheOneTournament(userId primitive.ObjectID, tournament *models.Tournament) error {
+	if !Config.UseRedis {
+		return nil
+	}
+
+	// tournamentCacheKey := getTournamentCacheKey(userId, tournament.ID)
+
+	tournamentCacheKey := "tournament:" + tournament.ID.Hex()
+
+	// Marshal the tournament data to JSON before caching
+	tournamentJSON, err := json.Marshal(tournament)
+	if err != nil {
+		return err
+	}
+
+	// Create a cache item and set it in Redis
+	item := &cache.Item{
+		Ctx:   context.TODO(),
+		Key:   tournamentCacheKey,
+		Value: tournamentJSON,
+		TTL:   time.Minute,
+	}
+
+	return GetRedisCache().Set(item)
+}
+
+func CacheOneTournament0(userId primitive.ObjectID, tournament *models.Tournament) {
 	if !Config.UseRedis {
 		return
 	}

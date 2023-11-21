@@ -1,9 +1,10 @@
 package controllers
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/kerem-ozt/GoodBlast_API/models"
-	"net/http"
 )
 
 // Ping godoc

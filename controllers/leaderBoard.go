@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -9,48 +8,26 @@ import (
 	"github.com/kerem-ozt/GoodBlast_API/services"
 )
 
+// Leaderboard godoc
+// @Summary      Init Leaderboard
+// @Description  initing leaderboard
+// @Tags         leaderboard
+// @Produce      json
+// @Success      200  {object}  models.Response
+// @Failure      400  {object}  models.Response
+// @Router       /init [get]
+// @Security     ApiKeyAuth
 func EnsureLeaderboardInitialized(c *gin.Context) {
 	response := &models.Response{
 		StatusCode: http.StatusBadRequest,
 		Success:    false,
 	}
 
-	leaderboard := services.EnsureLeaderboardInitialized("global")
-	// leaderboard, err := services.GetLeaderboard("global")
-	// if err != nil {
-	// 	c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-	// 	return
-	// }
-
-	fmt.Println("leaderboard: ", leaderboard)
-	// if len(leaderboard.Users) == 0 {
-	// 	c.JSON(http.StatusInternalServerError, gin.H{"message": "leaderboard is empty"})
-	// 	return
-	// }
-	response.StatusCode = http.StatusOK
-	response.Success = true
-	// response.Data = gin.H{"notes": notes, "prev": hasPrev, "next": hasNext}
-	response.SendResponse(c)
-	// c.JSON(http.StatusOK, gin.H{"message": "leaderboard is initialized"})
-}
-
-func GetGlobalLeaderboard(c *gin.Context) {
-	response := &models.Response{
-		StatusCode: http.StatusBadRequest,
-		Success:    false,
-	}
-
-	// leaderboard, err := services.GetLeaderboard("global")
-	leaderboard, err := services.GetGlobalLeaderboard("global")
+	leaderboard, err := services.EnsureLeaderboardInitialized("global")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
-
-	// if len(leaderboard.Users) == 0 {
-	// 	c.JSON(http.StatusInternalServerError, gin.H{"message": "leaderboard is empty"})
-	// 	return
-	// }
 
 	response.StatusCode = http.StatusOK
 	response.Success = true
@@ -58,6 +35,49 @@ func GetGlobalLeaderboard(c *gin.Context) {
 	response.SendResponse(c)
 }
 
+// Leaderboard godoc
+// @Summary      Get Global Leaderboard
+// @Description  get global leaderboard
+// @Tags         leaderboard
+// @Produce      json
+// @Success      200  {object}  models.Response
+// @Failure      400  {object}  models.Response
+// @Router       /getglobal [get]
+// @Security     ApiKeyAuth
+func GetGlobalLeaderboard(c *gin.Context) {
+	response := &models.Response{
+		StatusCode: http.StatusBadRequest,
+		Success:    false,
+	}
+
+	leaderboard, err := services.GetGlobalLeaderboard("global")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
+	if len(leaderboard.Users) == 0 {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "leaderboard is empty"})
+		return
+	}
+
+	response.StatusCode = http.StatusOK
+	response.Success = true
+	response.Data = gin.H{"leaderboard": leaderboard}
+	response.SendResponse(c)
+}
+
+// Leaderboard godoc
+// @Summary      Get Country Leaderboard
+// @Description  get caountry leaderboard
+// @Tags         leaderboard
+// @Accept       json
+// @Produce      json
+// @Param        country  query
+// @Success      200  {object}  models.Response
+// @Failure      400  {object}  models.Response
+// @Router       /getcountry [get]
+// @Security     ApiKeyAuth
 func GetLeaderboardByCountry(c *gin.Context) {
 	response := &models.Response{
 		StatusCode: http.StatusBadRequest,
@@ -65,7 +85,6 @@ func GetLeaderboardByCountry(c *gin.Context) {
 	}
 
 	country := c.Query("country")
-	// leaderboardtype := c.Query("leaderboardtype")
 
 	leaderboard, err := services.GetLeaderboardByCountry("global", country)
 	if err != nil {
@@ -73,10 +92,10 @@ func GetLeaderboardByCountry(c *gin.Context) {
 		return
 	}
 
-	// if len(leaderboard.Users) == 0 {
-	// 	c.JSON(http.StatusInternalServerError, gin.H{"message": "leaderboard is empty"})
-	// 	return
-	// }
+	if len(leaderboard.Users) == 0 {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "leaderboard is empty"})
+		return
+	}
 
 	response.StatusCode = http.StatusOK
 	response.Success = true

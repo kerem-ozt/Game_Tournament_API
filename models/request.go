@@ -68,6 +68,7 @@ func (a TournamentRequest) Validate() error {
 		validation.Field(&a.MinLevels, validation.Required),
 		validation.Field(&a.EntryFee, validation.Required),
 		validation.Field(&a.MaxParticipants, validation.Required),
+		validation.Field(&a.Participants),
 	)
 }
 
@@ -80,7 +81,7 @@ type ProgressRequest struct {
 func (a ProgressRequest) Validate() error {
 	return validation.ValidateStruct(&a,
 		validation.Field(&a.UserID, validation.Required),
-		validation.Field(&a.Score, validation.Required),
-		validation.Field(&a.Coin, validation.Required),
+		validation.Field(&a.Score),
+		validation.Field(&a.Coin),
 	)
 }

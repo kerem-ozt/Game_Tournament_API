@@ -146,32 +146,17 @@ const docTemplate = `{
             }
         },
 
-        "/tournaments": {
+
+        "/leaderBoard/init": {
             "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "gets user tournaments with pagination",
-                "consumes": [
-                    "application/json"
-                ],
+                "description": "init leaderboard",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "tournaments"
+                    "leaderboard"
                 ],
-                "summary": "Get Tournaments",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Switch page by 'page'",
-                        "name": "page",
-                        "in": "query"
-                    }
-                ],
+                "summary": "Init Leaderboard",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -186,14 +171,225 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
-            "post": {
-                "security": [
+            }
+        },
+
+
+        "/leaderBoard/getglobal": {
+            "get": {
+                "description": "get global leaderboard",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "leaderboard"
+                ],
+                "summary": "Get Global Leaderboard",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    }
+                }
+            }
+        },
+
+        "/leaderBoard/getcountry": {
+            "get": {
+                "description": "get country leaderboard",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "leaderboard"
+                ],
+                "summary": "Get Country Leaderboard",
+                "parameters": [
                     {
-                        "ApiKeyAuth": []
+                        "type": "string",
+                        "description": "Country",
+                        "name": "country",
+                        "in": "query",
+                        "required": true
                     }
                 ],
-                "description": "creates a new tournament",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    }
+                }
+            }
+        },
+
+        "/tournament/getall": {
+            "get": {
+                "description": "get all tournaments",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tournament"
+                ],
+                "summary": "Get All Tournaments",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "data": {
+                                    "tournaments": [
+                                        {
+                                            "id": "5f9b9b5b9c9b7a1b9c9b7a1b",
+                                            "participants": [
+                                                "5f9b9b5b9c9b7a1b9c9b7a1b"
+                                            ],
+                                            "minLevels": 1,
+                                            "entryFee": 500,
+                                            "maxParticipants": 35,
+                                            "scores": [],
+                                            "groups": [],
+                                            "startTime": "2020-10-30T00:00:00Z",
+                                            "endTime": "2020-10-31T00:00:00Z",
+                                            "createdAt": "2020-10-30T00:00:00Z",
+                                            "updatedAt": "2020-10-30T00:00:00Z"
+                                        }
+                                    ],
+                                    "prev": false,
+                                    "next": false
+                                },
+                                "message": "OK",
+                                "success": true
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "data": null,
+                                "message": "Bad Request",
+                                "success": false
+                            }
+                        }
+                    }
+                }
+            }
+        },
+
+        "/tournament/getbyid": {
+            "get": {
+                "description": "get tournament by id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tournament"
+                ],
+                "summary": "Get Tournament By Id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Id",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "data": {
+                                    "tournament": {
+                                        "id": "5f9b9b5b9c9b7a1b9c9b7a1b",
+                                        "participants": [
+                                            "5f9b9b5b9c9b7a1b9c9b7a1b"
+                                        ],
+                                        "minLevels": 1,
+                                        "entryFee": 500,
+                                        "maxParticipants": 35,
+                                        "scores": [],
+                                        "groups": [],
+                                        "startTime": "2020-10-30T00:00:00Z",
+                                        "endTime": "2020-10-31T00:00:00Z",
+                                        "createdAt": "2020-10-30T00:00:00Z",
+                                        "updatedAt": "2020-10-30T00:00:00Z"
+                                    }
+                                },
+                                "message": "OK",
+                                "success": true
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "data": null,
+                                "message": "Bad Request",
+                                "success": false
+                            }
+                        }
+                    }
+                }
+            }
+        },
+
+        "/tournament/create": {
+            "post": {
+                "description": "create a new tournament",
                 "consumes": [
                     "application/json"
                 ],
@@ -201,7 +397,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "tournaments"
+                    "tournament"
                 ],
                 "summary": "Create Tournament",
                 "parameters": [
@@ -213,6 +409,220 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/models.TournamentRequest"
                         }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "data": {
+                                    "tournament": {
+                                        "id": "5f9b9b5b9c9b7a1b9c9b7a1b",
+                                        "participants": [
+                                            "5f9b9b5b9c9b7a1b9c9b7a1b"
+                                        ],
+                                        "minLevels": 1,
+                                        "entryFee": 500,
+                                        "maxParticipants": 35,
+                                        "scores": [],
+                                        "groups": [],
+                                        "startTime": "2020-10-30T00:00:00Z",
+                                        "endTime": "2020-10-31T00:00:00Z",
+                                        "createdAt": "2020-10-30T00:00:00Z",
+                                        "updatedAt": "2020-10-30T00:00:00Z"
+                                    }
+                                },
+                                "message": "OK",
+                                "success": true
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "data": null,
+                                "message": "Bad Request",
+                                "success": false
+                            }
+                        }
+                    }
+                }
+            }
+        },
+
+        "/tournament/creategroup": {
+            "post": {
+                "description": "create a new tournament group",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tournament"
+                ],
+                "summary": "Create Tournament Group",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "data": {
+                                    "tournament": {
+                                        "id": "5f9b9b5b9c9b7a1b9c9b7a1b",
+                                        "participants": [
+                                            "5f9b9b5b9c9b7a1b9c9b7a1b"
+                                        ],
+                                        "minLevels": 1,
+                                        "entryFee": 500,
+                                        "maxParticipants": 35,
+                                        "scores": [],
+                                        "groups": [
+                                            {
+                                                "groupId": "5f9b9b5b9c9b7a1b9c9b7a1b",
+                                                "participants": [
+                                                    "5f9b9b5b9c9b7a1b9c9b7a1b"
+                                                ]
+                                            }
+                                        ],
+                                        "startTime": "2020-10-30T00:00:00Z",
+                                        "endTime": "2020-10-31T00:00:00Z",
+                                        "createdAt": "2020-10-30T00:00:00Z",
+                                        "updatedAt": "2020-10-30T00:00:00Z"
+                                    }
+                                },
+                                "message": "OK",
+                                "success": true
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "data": null,
+                                "message": "Bad Request",
+                                "success": false
+                            }
+                        }
+                    }
+                }
+            }
+        },
+
+        "/tournament/progress": {
+            "post": {
+                "description": "update tournament progress",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tournament"
+                ],
+                "summary": "Update Tournament Progress",
+                "parameters": [
+                    {
+                        "description": "Tournament Progress Request",
+                        "name": "tournamentID",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "data": {
+                                    "tournament": {
+                                        "id": "5f9b9b5b9c9b7a1b9c9b7a1b",
+                                        "participants": [
+                                            "5f9b9b5b9c9b7a1b9c9b7a1b"
+                                        ],
+                                        "minLevels": 1,
+                                        "entryFee": 500,
+                                        "maxParticipants": 35,
+                                        "scores": [
+                                            {
+                                                "userId": "5f9b9b5b9c9b7a1b9c9b7a1b",
+                                                "score": 100
+                                            }
+                                        ],
+                                        "groups": [
+                                            {
+                                                "groupId": "5f9b9b5b9c9b7a1b9c9b7a1b",
+                                                "participants": [
+                                                    "5f9b9b5b9c9b7a1b9c9b7a1b"
+                                                ]
+                                            }
+                                        ],
+                                        "startTime": "2020-10-30T00:00:00Z",
+                                        "endTime": "2020-10-31T00:00:00Z",
+                                        "createdAt": "2020-10-30T00:00:00Z",
+                                        "updatedAt": "2020-10-30T00:00:00Z"
+                                    }
+                                },
+                                "message": "OK",
+                                "success": true
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "data": null,
+                                "message": "Bad Request",
+                                "success": false
+                            }
+                        }
+                    }
+                }
+            }
+        },
+
+
+        "/user/whoami": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "gets current users info",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Who Am I",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Switch page by 'page'",
+                        "name": "page",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -232,14 +642,9 @@ const docTemplate = `{
             }
         },
 
-        "/user": {
+        "/user/getall": {
             "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "gets current users info",
+                "description": "gets all users",
                 "consumes": [
                     "application/json"
                 ],
@@ -249,13 +654,149 @@ const docTemplate = `{
                 "tags": [
                     "user"
                 ],
-                "summary": "Get My Info",
+                "summary": "Get All Users",
                 "parameters": [
                     {
                         "type": "string",
                         "description": "Switch page by 'page'",
                         "name": "page",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Switch limit by 'limit'",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "data": {
+                                    "users": [
+                                        {
+                                            "id": "5f9b9b5b9c9b7a1b9c9b7a1b",
+                                            "email": "test@gmail.com",
+                                            "name": "test",
+                                            "score": 0,
+                                            "country": "Turkey",
+                                            "createdAt": "2020-10-30T00:00:00Z",
+                                            "updatedAt": "2020-10-30T00:00:00Z"
+                                        }
+                                    ],
+                                    "prev": false,
+                                    "next": false
+                                },
+                                "message": "OK",
+                                "success": true
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "data": null,
+                                "message": "Bad Request",
+                                "success": false
+                            }
+                        }
+                    }
+                }
+            }
+        },
+
+        "/user/getbyid": {
+            "get": {
+                "description": "gets user by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Get User By Id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Id",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "data": {
+                                    "user": {
+                                        "id": "5f9b9b5b9c9b7a1b9c9b7a1b",
+                                        "email": "test@gmail.com",
+                                        "name": "test",
+                                        "score": 0,
+                                        "country": "Turkey",
+                                        "createdAt": "2020-10-30T00:00:00Z",
+                                        "updatedAt": "2020-10-30T00:00:00Z"
+                                    }
+                                },
+                                "message": "OK",
+                                "success": true
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "data": null,
+                                "message": "Bad Request",
+                                "success": false
+                            }
+                        }
+                    }
+                }
+            }
+        },
+
+        "/user/delete": {
+            "delete": {
+                "description": "deletes user by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Delete User By Id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Id",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -272,14 +813,12 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
+            }
+        },
+
+        "/user/updateprogress": {
             "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "upgrade users score",
+                "description": "update user progress",
                 "consumes": [
                     "application/json"
                 ],
@@ -289,7 +828,7 @@ const docTemplate = `{
                 "tags": [
                     "user"
                 ],
-                "summary": "Progress Update",
+                "summary": "Update User Progress",
                 "parameters": [
                     {
                         "description": "Progress Request",
@@ -310,6 +849,53 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    }
+                }
+            }
+        },
+
+        "/user/entertournament": {
+            "post": {
+                "description": "enter tournament",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Enter Tournament",
+                "parameters": [
+                    {
+                        "description": "Enter Tournament Request",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.EnterTournamentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/models.Response"
                         }
@@ -376,6 +962,40 @@ const docTemplate = `{
                 }
             }
         },
+        "model.TournamentRequest": {
+            "type": "object",
+            "properties": {
+                "minLevels": {
+                    "type": "string"
+                },
+                "entryFee": {
+                    "type": "string"
+                },
+                "maxParticipants": {
+                    "type": "string"
+                },
+                "participants": {
+                    "type": "array",
+                    "items": {
+                        "type": "primitive.ObjectID"
+                    }
+                }
+            }
+        },
+        "models.ProgressRequest": {
+            "type": "object",
+            "properties": {
+                "userID": {
+                    "type": "string"
+                },
+                "score": {
+                    "type": "string"
+                },
+                "coin": {
+                    "type": "string"
+                }
+            }
+        },
         "models.Response": {
             "type": "object",
             "properties": {
@@ -404,7 +1024,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:8080",
+	Host:             "localhost:3002",
 	BasePath:         "/",
 	Schemes:          []string{"http"},
 	Title:            "GoodBlast REST API",

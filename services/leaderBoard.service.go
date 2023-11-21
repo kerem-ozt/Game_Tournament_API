@@ -1,5 +1,3 @@
-// services/leaderboard.go
-
 package services
 
 import (
@@ -47,7 +45,7 @@ func AddUserToLeaderboard(userID primitive.ObjectID, progress int, leaderboardTy
 	return nil
 }
 
-// GetLeaderboard returns the leaderboard for a given type
+// GetGlobalLeaderboard returns the global leaderboard
 func GetGlobalLeaderboard(leaderboardType string) (*db.Leaderboard, error) {
 	leaderboard, err := getOrCreateLeaderboard(leaderboardType)
 	if err != nil {
@@ -121,17 +119,17 @@ func getOrCreateLeaderboard(leaderboardType string) (*db.Leaderboard, error) {
 }
 
 // EnsureLeaderboardInitialized initializes the leaderboard with all users
-func EnsureLeaderboardInitialized(leaderboardType string) error {
+func EnsureLeaderboardInitialized(leaderboardType string) (*db.Leaderboard, error) {
 
 	leaderboard, err := getOrCreateLeaderboard(leaderboardType)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// Get all users from the database
 	users, err := getAllUsers()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// Populate the leaderboard with all users
@@ -159,10 +157,10 @@ func EnsureLeaderboardInitialized(leaderboardType string) error {
 	// Save the updated leaderboard
 	err = mgm.Coll(leaderboard).Update(leaderboard)
 	if err != nil {
-		return errors.New("failed to update leaderboard")
+		return nil, errors.New("failed to update leaderboard")
 	}
 
-	return nil
+	return leaderboard, nil
 }
 
 // getAllUsers retrieves all users from the database
@@ -175,13 +173,6 @@ func getAllUsers() ([]db.User, error) {
 		fmt.Println("Error getting users:", err)
 		return nil, errors.New("failed to get all users")
 	}
-
-	// query := bson.M{"type": leaderboardType}
-	// err := mgm.Coll(&db.Leaderboard{}).First(query, Leaderboard)
-	// if err == nil {
-	// 	// Leaderboard already exists
-	// 	return Leaderboard, nil
-	// }
 
 	return users, nil
 }

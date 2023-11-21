@@ -10,19 +10,16 @@ func leaderboardRouter(router *gin.RouterGroup, handlers ...gin.HandlerFunc) {
 	{
 		leaderBoard.GET(
 			"init",
-			// validators.CreateTournamentValidator(),
 			controllers.EnsureLeaderboardInitialized,
 		)
 
 		leaderBoard.GET(
 			"getglobal",
-			// validators.CreateTournamentValidator(),
 			controllers.GetGlobalLeaderboard,
 		)
 
 		leaderBoard.GET(
 			"getcountry",
-			// validators.CreateTournamentValidator(),
 			controllers.GetLeaderboardByCountry,
 		)
 	}
