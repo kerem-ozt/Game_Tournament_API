@@ -166,12 +166,12 @@ func ProgressTournament(c *gin.Context) {
 
 	winnersStr := make([]string, len(winners))
 	for i, winner := range winners {
-		winnersStr[i] = winner.Hex()
+		winnersStr[i] = winner.ID.Hex() + " " + strconv.Itoa(winner.Rank)
 	}
 
 	response.StatusCode = http.StatusCreated
 	response.Success = true
-	response.Data = gin.H{"winners": winnersStr}
+	response.Data = gin.H{"winners": winners}
 	response.SendResponse(c)
 }
 

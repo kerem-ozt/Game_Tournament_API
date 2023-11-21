@@ -122,15 +122,15 @@ func CreateTournamentGroups() ([]db.TournamentGroup, error) {
 	return nil, errors.New("no groups created")
 }
 
-// EnterTournament enter user to tournament
-func ProgressTournament(tournamentID primitive.ObjectID) ([]primitive.ObjectID, error) {
-	tournament := &db.Tournament{}
+// Define a struct to store the participant ID and rank
+type Participant struct {
+	ID   primitive.ObjectID `bson:"id"`
+	Rank int
+}
 
-	// Define a struct to store the participant ID and rank
-	type Participant struct {
-		ID   primitive.ObjectID `bson:"id"`
-		Rank int
-	}
+// EnterTournament enter user to tournament
+func ProgressTournament(tournamentID primitive.ObjectID) ([]Participant, error) {
+	tournament := &db.Tournament{}
 
 	// Find the tournament by ID
 	err := mgm.Coll(tournament).FindByID(tournamentID, tournament)
@@ -211,15 +211,14 @@ func ProgressTournament(tournamentID primitive.ObjectID) ([]primitive.ObjectID, 
 				}
 			}
 		}
+
+		fmt.Println("Sorted:", participants)
+
+		winners = participants
 	}
 
 	// Save the updated tournament to the cache
-	CacheOneTournament(tournament.ID, tournament)
+	CacheOneTournament(tournament.ID, winners)
 
-	// Return the winner IDs
-	var winnerIDs []primitive.ObjectID
-	for _, winner := range winners {
-		winnerIDs = append(winnerIDs, winner.ID)
-	}
-	return winnerIDs, nil
+	return winners, nil
 }

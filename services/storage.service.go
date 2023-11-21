@@ -67,17 +67,18 @@ func getTournamentCacheKey(userId primitive.ObjectID, tournamentId primitive.Obj
 	return "req:cache:tournament:" + userId.Hex() + ":" + tournamentId.Hex()
 }
 
-func CacheOneTournament(userId primitive.ObjectID, tournament *models.Tournament) error {
+func CacheOneTournament(tournamentId primitive.ObjectID, winners []Participant) error {
 	if !Config.UseRedis {
 		return nil
 	}
 
 	// tournamentCacheKey := getTournamentCacheKey(userId, tournament.ID)
 
-	tournamentCacheKey := "tournament:" + tournament.ID.Hex()
+	tournamentCacheKey := "tournament:" + tournamentId.Hex()
 
 	// Marshal the tournament data to JSON before caching
-	tournamentJSON, err := json.Marshal(tournament)
+	tournamentJSON, err := json.Marshal(winners)
+
 	if err != nil {
 		return err
 	}
