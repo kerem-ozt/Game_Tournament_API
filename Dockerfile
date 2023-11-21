@@ -16,8 +16,8 @@ COPY .env.docker ./.env
 # Build the Go app
 RUN go build -o main .
 
-# Expose port 8080 to the outside world
-EXPOSE 8080
+# Expose port 3002 to the outside world
+EXPOSE 3002
 
 # Run the executable
 CMD ["./main"]

@@ -53,7 +53,7 @@ definitions:
         type: string
       success:
         type: boolean
-host: localhost:8080
+host: localhost:3002
 info:
   contact:
     email: mkeremozt@gmail.com
