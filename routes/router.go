@@ -24,9 +24,9 @@ func New() *gin.Engine {
 	{
 		PingRoute(v1)
 		AuthRoute(v1)
-		UserRoute(v1)
-		TournamentRoute(v1)
-		leaderboardRouter(v1)
+		UserRoute(v1, middlewares.JWTMiddleware())
+		TournamentRoute(v1, middlewares.JWTMiddleware())
+		leaderboardRouter(v1, middlewares.JWTMiddleware())
 	}
 
 	docs.SwaggerInfo.BasePath = v1.BasePath() // adds /v1 to swagger base path
