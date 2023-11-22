@@ -12,7 +12,6 @@ import (
 	"github.com/go-redis/cache/v8"
 	"github.com/go-redis/redis/v8"
 	"github.com/kamva/mgm/v3"
-	models "github.com/kerem-ozt/GoodBlast_API/models/db"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -64,10 +63,6 @@ func CheckRedisConnection() {
 	log.Println("Connected to Redis!")
 }
 
-// func getTournamentCacheKey(userId primitive.ObjectID, tournamentId primitive.ObjectID) string {
-// 	return "req:cache:tournament:" + userId.Hex() + ":" + tournamentId.Hex()
-// }
-
 func getTournamentCacheKey(tournamentId primitive.ObjectID) string {
 	return "tournament:" + tournamentId.Hex()
 }
@@ -114,16 +109,4 @@ func GetTournamentFromCache(tournamentId primitive.ObjectID) (string, error) {
 	}
 
 	return result, nil
-}
-
-// func GetTournamentFromCache(userId primitive.ObjectID, tournamentId primitive.ObjectID) (*models.Tournament, error) {
-func GetTournamentFromCache0(tournamentId primitive.ObjectID) (*models.Tournament, error) {
-	if !Config.UseRedis {
-		return nil, errors.New("no redis client, set USE_REDIS in .env")
-	}
-
-	tournament := &models.Tournament{}
-	tournamentCacheKey := getTournamentCacheKey(tournamentId)
-	err := GetRedisCache().Get(context.TODO(), tournamentCacheKey, tournament)
-	return tournament, err
 }

@@ -598,7 +598,7 @@ const docTemplate = `{
             }
         },
 
-        "/tournament/gettournamentwinners": {
+        "/tournament/gettournamentresults": {
             "get": {
                 "description": "get tournament winners",
                 "produces": [

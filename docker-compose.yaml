@@ -7,7 +7,9 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "3002:8080"
+      - "3002:3002"
+    environment:
+      - MONGO_URI=mongodb+srv://kerem:Test789@cluster0.anphtnd.mongodb.net/
     volumes:
       - ./logs:/app/logs
     restart: unless-stopped
