@@ -45,6 +45,7 @@ The postman collection of the study is given in the project file. The Swagger do
 
 The project consists of 3 main parts: controllers, services and routes, which are frequently used. Services encapsulate the core logic of your application, controllers handle HTTP requests and responses, and routes define the structure and mapping of API.  There is also a model folder that contains the mongodb models and the request and response models for validation. And a separate middleware folder for middlewares and validations. Together, they contribute to a clean and modular architecture.
 
+```
 ├── Dockerfile
 ├── LICENSE
 ├── README.md
@@ -98,6 +99,7 @@ The project consists of 3 main parts: controllers, services and routes, which ar
     ├── token.service.go
     ├── tournament.service.go
     └── user.service.go
+```
 
 ## Configuration
 
