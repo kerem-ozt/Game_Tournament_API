@@ -4,6 +4,11 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+const (
+	LeaderboardTypeGlobal  = "global"
+	LeaderboardTypeCountry = "country"
+)
+
 type Leaderboard struct {
 	ID    primitive.ObjectID `bson:"_id,omitempty"`
 	Type  string             `bson:"type"`

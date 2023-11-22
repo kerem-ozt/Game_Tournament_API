@@ -1,6 +1,7 @@
 package services
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"math/rand"
@@ -221,4 +222,23 @@ func ProgressTournament(tournamentID primitive.ObjectID) ([]Participant, error) 
 	CacheOneTournament(tournament.ID, winners)
 
 	return winners, nil
+}
+
+// Get tournament winners from cache
+func GetTournamentWinnersFromCache(tournamentID primitive.ObjectID) ([]Participant, error) {
+
+	// Get the tournament from the cache
+	tournament, err := GetTournamentFromCache(tournamentID)
+	if err != nil {
+		return nil, errors.New("cannot get tournament from cache")
+	}
+
+	var participants []Participant
+	err = json.Unmarshal([]byte(tournament), &participants)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return nil, err
+	}
+
+	return participants, nil
 }

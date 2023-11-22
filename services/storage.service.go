@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"sync"
 	"time"
@@ -63,8 +64,12 @@ func CheckRedisConnection() {
 	log.Println("Connected to Redis!")
 }
 
-func getTournamentCacheKey(userId primitive.ObjectID, tournamentId primitive.ObjectID) string {
-	return "req:cache:tournament:" + userId.Hex() + ":" + tournamentId.Hex()
+// func getTournamentCacheKey(userId primitive.ObjectID, tournamentId primitive.ObjectID) string {
+// 	return "req:cache:tournament:" + userId.Hex() + ":" + tournamentId.Hex()
+// }
+
+func getTournamentCacheKey(tournamentId primitive.ObjectID) string {
+	return "tournament:" + tournamentId.Hex()
 }
 
 func CacheOneTournament(tournamentId primitive.ObjectID, winners []Participant) error {
@@ -94,28 +99,31 @@ func CacheOneTournament(tournamentId primitive.ObjectID, winners []Participant) 
 	return GetRedisCache().Set(item)
 }
 
-func CacheOneTournament0(userId primitive.ObjectID, tournament *models.Tournament) {
+func GetTournamentFromCache(tournamentId primitive.ObjectID) (string, error) {
 	if !Config.UseRedis {
-		return
+		return "", errors.New("no redis client, set USE_REDIS in .env")
 	}
 
-	tournamentCacheKey := getTournamentCacheKey(userId, tournament.ID)
+	tournamentCacheKey := getTournamentCacheKey(tournamentId)
 
-	_ = GetRedisCache().Set(&cache.Item{
-		Ctx:   context.TODO(),
-		Key:   tournamentCacheKey,
-		Value: tournament,
-		TTL:   time.Minute,
-	})
+	var result string
+	err := GetRedisCache().Get(context.TODO(), tournamentCacheKey, &result)
+	if err != nil {
+		fmt.Println("err:", err)
+		return "", err
+	}
+
+	return result, nil
 }
 
-func GetTournamentFromCache(userId primitive.ObjectID, tournamentId primitive.ObjectID) (*models.Tournament, error) {
+// func GetTournamentFromCache(userId primitive.ObjectID, tournamentId primitive.ObjectID) (*models.Tournament, error) {
+func GetTournamentFromCache0(tournamentId primitive.ObjectID) (*models.Tournament, error) {
 	if !Config.UseRedis {
 		return nil, errors.New("no redis client, set USE_REDIS in .env")
 	}
 
 	tournament := &models.Tournament{}
-	tournamentCacheKey := getTournamentCacheKey(userId, tournamentId)
+	tournamentCacheKey := getTournamentCacheKey(tournamentId)
 	err := GetRedisCache().Get(context.TODO(), tournamentCacheKey, tournament)
 	return tournament, err
 }

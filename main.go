@@ -37,6 +37,9 @@ func main() {
 	services.LoadConfig()
 	services.InitMongoDB()
 
+	// Init leaderboard
+	services.EnsureLeaderboardInitialized("global")
+
 	// Check Redis connection if configured
 	if services.Config.UseRedis {
 		services.CheckRedisConnection()

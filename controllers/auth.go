@@ -56,6 +56,14 @@ func Register(c *gin.Context) {
 		return
 	}
 
+	// add user to leaderboard
+	err = services.AddUserToLeaderboard(user.ID, db.InitialProgress, db.LeaderboardTypeGlobal)
+	if err != nil {
+		response.Message = err.Error()
+		response.SendResponse(c)
+		return
+	}
+
 	response.StatusCode = http.StatusCreated
 	response.Success = true
 	response.Data = gin.H{

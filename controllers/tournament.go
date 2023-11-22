@@ -202,3 +202,40 @@ func CreateTournamentGroups(c *gin.Context) {
 	response.Data = gin.H{"groups": groups}
 	response.SendResponse(c)
 }
+
+// GetTournamentWinnersFromCache godoc
+// @Summary      Get Tournament Winners From Cache
+// @Description  gets tournament winners from cache
+// @Tags         tournaments
+// @Produce      json
+// @Param        tournamentID  query	string  true  "Tournament ID"
+// @Success      200  {object}  models.Response
+// @Failure      400  {object}  models.Response
+// @Router       /getwinners [get]
+// @Security     ApiKeyAuth
+func GetTournamentWinnersFromCache(c *gin.Context) {
+	response := &models.Response{
+		StatusCode: http.StatusBadRequest,
+		Success:    false,
+	}
+
+	tournamentIDStr := c.Query("tournamentID")
+	tournamentID, err := primitive.ObjectIDFromHex(tournamentIDStr)
+	if err != nil {
+		response.Message = err.Error()
+		response.SendResponse(c)
+		return
+	}
+
+	winners, err := services.GetTournamentWinnersFromCache(tournamentID)
+	if err != nil {
+		response.Message = err.Error()
+		response.SendResponse(c)
+		return
+	}
+
+	response.StatusCode = http.StatusCreated
+	response.Success = true
+	response.Data = gin.H{"winners": winners}
+	response.SendResponse(c)
+}

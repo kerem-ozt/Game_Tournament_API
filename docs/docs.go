@@ -598,6 +598,75 @@ const docTemplate = `{
             }
         },
 
+        "/tournament/gettournamentwinners": {
+            "get": {
+                "description": "get tournament winners",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tournament"
+                ],
+                "summary": "Get Tournament Winners",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Tournament ID",
+                        "name": "tournamentID",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "data": {
+                                    "winners": [
+                                        {
+                                            "userId": "5f9b9b5b9c9b7a1b9c9b7a1b",
+                                            "score": 100
+                                        }
+                                    ]
+                                },
+                                "message": "OK",
+                                "success": true
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "data": null,
+                                "message": "Bad Request",
+                                "success": false
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "data": null,
+                                "message": "Internal Server Error",
+                                "success": false
+                            }
+                        }
+                    }
+                }
+            }
+        },
 
         "/user/whoami": {
             "get": {

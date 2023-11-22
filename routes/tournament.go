@@ -34,5 +34,10 @@ func TournamentRoute(router *gin.RouterGroup, handlers ...gin.HandlerFunc) {
 			"/progress",
 			controllers.ProgressTournament,
 		)
+
+		tournaments.GET(
+			"/gettournamentwinners",
+			controllers.GetTournamentWinnersFromCache,
+		)
 	}
 }
