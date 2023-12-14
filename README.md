@@ -1,4 +1,4 @@
-# GoodBlast API
+# Game Tournament Management API
 
 API for managing and conducting gaming tournaments.
 
