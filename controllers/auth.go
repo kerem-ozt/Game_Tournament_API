@@ -172,6 +172,11 @@ func Refresh(c *gin.Context) {
 	}
 
 	accessToken, refreshToken, err := services.GenerateAccessTokens(user)
+	if err != nil {
+		response.Message = err.Error()
+		response.SendResponse(c)
+		return
+	}
 	response.StatusCode = http.StatusOK
 	response.Success = true
 	response.Data = gin.H{
