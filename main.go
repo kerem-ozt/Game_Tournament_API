@@ -38,7 +38,8 @@ func main() {
 	services.InitMongoDB()
 
 	// Init leaderboard
-	services.EnsureLeaderboardInitialized("global")
+	_, _ = services.EnsureLeaderboardInitialized("global")
+	// services.EnsureLeaderboardInitialized("global")
 
 	// Check Redis connection if configured
 	if services.Config.UseRedis {
@@ -66,7 +67,7 @@ func main() {
 	}()
 
 	// Create the first tournament
-	services.CreateTournament()
+	_, _ = services.CreateTournament()
 
 	// Schedule routine to create a new tournament every 24 hours
 	go func() {
@@ -76,13 +77,13 @@ func main() {
 		durationUntilMidnight := nextMidnight.Sub(now)
 		time.Sleep(durationUntilMidnight)
 
-		services.CreateTournament()
+		_, _ = services.CreateTournament()
 
 		ticker := time.NewTicker(24 * time.Hour)
 		defer ticker.Stop()
 
 		for range ticker.C {
-			services.CreateTournament()
+			_, _ = services.CreateTournament()
 		}
 	}()
 

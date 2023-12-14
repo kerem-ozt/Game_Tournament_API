@@ -219,7 +219,8 @@ func ProgressTournament(tournamentID primitive.ObjectID) ([]Participant, error) 
 	}
 
 	// Save the updated tournament to the cache
-	CacheOneTournament(tournament.ID, winners)
+	// handle return value
+	_ = CacheOneTournament(tournament.ID, winners)
 
 	return winners, nil
 }

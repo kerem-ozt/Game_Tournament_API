@@ -14,7 +14,7 @@ func TestUserService(t *testing.T) {
 	services.LoadConfig()
 	services.InitMongoDB()
 
-	services.EnsureLeaderboardInitialized("global")
+	_, _ = services.EnsureLeaderboardInitialized("global")
 
 	if services.Config.UseRedis {
 		services.CheckRedisConnection()
