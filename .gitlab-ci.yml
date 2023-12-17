@@ -2,7 +2,7 @@ image: golang:latest
 
 .go-cache:
     variables:
-        GOPATH: $CI_PROJECT_DIR/.go
+        GOPATH: "/builds/mkeremozt/Tournament-Management-API/.go"
     cache:
       paths:
         - .go/pkg/mod/
@@ -22,7 +22,7 @@ lint:
     extends: .go-cache
     allow_failure: false
     script:
-      - golangci-lint run -v
+      - golangci-lint run -v --timeout=5m
 
 test:
   stage: test
@@ -41,22 +41,32 @@ build:
 build_image:
   image: docker:stable
   stage: release
-  services:
-    - docker:dind
+  # services:
+  #   - docker:dind
   before_script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    # - docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+    # - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    # - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD"
+    - docker info
   script:
-    - |
-      if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
-        tag=""
-        echo "Running on default branch '$CI_DEFAULT_BRANCH': tag = 'latest'"
-      else
-        tag=":$CI_COMMIT_REF_SLUG"
-        echo "Running on branch '$CI_COMMIT_BRANCH': tag = $tag"
-      fi
-    - docker build --pull -t "$CI_REGISTRY_IMAGE${tag}" .
-    - docker push "$CI_REGISTRY_IMAGE${tag}"
+    # - |
+    #   echo "LOG FOR TEST"
+    #   if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
+    #     tag=""
+    #     echo "Running on default branch '$CI_DEFAULT_BRANCH': tag = 'latest'"
+    #   else
+    #     tag=":$CI_COMMIT_REF_SLUG"
+    #     echo "Running on branch '$CI_COMMIT_BRANCH': tag = $tag"
+    #   fi
+    # - docker build --pull -t "$CI_REGISTRY_IMAGE${tag}" .
+    - docker build -t mkeremozt/game-api-go .
+    # - docker push "$CI_REGISTRY_IMAGE${tag}"
+    - docker push mkeremozt/game-api-go 
+    # - docker push "$CI_REGISTRY_IMAGE"
   rules:
     - if: $CI_COMMIT_BRANCH
       exists:
         - Dockerfile
+  services:
+      - docker:stable-dind

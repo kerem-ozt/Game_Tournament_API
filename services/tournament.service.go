@@ -196,10 +196,10 @@ func ProgressTournament(tournamentID primitive.ObjectID) ([]Participant, error) 
 		})
 
 		// Get the top 3 winner IDs within the group
-		top3winnerIDs := []primitive.ObjectID{}
-		for i := 0; i < 3 && i < len(participants); i++ {
-			top3winnerIDs = append(top3winnerIDs, participants[i].ID)
-		}
+		// top3winnerIDs := []primitive.ObjectID{}
+		// for i := 0; i < 3 && i < len(participants); i++ {
+		// 	top3winnerIDs = append(top3winnerIDs, participants[i].ID)
+		// }
 
 		// Update progress for top 3 winners within the group with rewards
 		rewards := []int{5000, 3000, 2000, 1000, 1000, 1000, 1000, 1000, 1000, 1000}

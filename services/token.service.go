@@ -2,13 +2,14 @@ package services
 
 import (
 	"errors"
+	"time"
+
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/kamva/mgm/v3"
 	"github.com/kamva/mgm/v3/field"
 	db "github.com/kerem-ozt/GoodBlast_API/models/db"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"time"
 )
 
 // CreateToken create a new token record
@@ -78,7 +79,8 @@ func VerifyToken(token string, tokenType string) (*db.Token, error) {
 		return nil, errors.New("not valid token")
 	}
 
-	if time.Now().Sub(claims.ExpiresAt.Time) > 10*time.Second {
+	// if time.Now().Sub(claims.ExpiresAt.Time) > 10*time.Second {
+	if time.Since(claims.ExpiresAt.Time) > 10*time.Second {
 		return nil, errors.New("token is expired")
 	}
 

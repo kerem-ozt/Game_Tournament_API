@@ -18,7 +18,7 @@ logs/
 .DS_Store
 
 # dotenv file
-.env
+# .env
 
 # Go workspace file
 go.work
