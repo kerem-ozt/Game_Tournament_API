@@ -12,7 +12,6 @@ API for managing and conducting gaming tournaments.
 - [Project Structure](#project-structure)
 - [Configuration](#configuration)
 - [Deployment](#deployment)
-- [Notes](#notes)
 
 ## Introduction
 
@@ -111,9 +110,6 @@ An instance with a Linux operating system was created on an EC2 machine on AWS, 
 
 13.51.6.67 public ipv4 address is accessible.
 
-## Notes
-
-This is my first Go project, and I started by choosing a simple boilerplate to facilitate development. Since it's a REST-heavy application, I structured the project similarly to the file system I'm familiar with from Node.js. To speed up development, I chose MongoDB for the database. I implemented a basic Redis implementation. For deployment, I chose AWS to explore a different cloud provider. I created a Dockerfile to build the project image.
 
 My work has been busier than I expected for a few days. So I couldn't allocate the planned time. As a result, I haven't completed the Swagger documentation and couldn't write detailed tests yet.
 
